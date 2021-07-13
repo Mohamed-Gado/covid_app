@@ -285,6 +285,8 @@ class _AnalyzeByDayWidgetState extends State<AnalyzeByDayWidget> {
           .fetchDatabaseSymptoms()
           .then((value) {
         setState(() {
+          Provider.of<Operation>(context, listen: false)
+              .filterSqlSymptomsByDay('one');
           isInit = false;
         });
       });

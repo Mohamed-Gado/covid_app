@@ -17,7 +17,7 @@ class AgesLineChartWidget extends StatelessWidget {
 
     return SizedBox(
       width: 300,
-      height: 150,
+      height: 180,
       child: LineChart(
         LineChartData(
           lineTouchData: LineTouchData(enabled: false),
@@ -140,8 +140,7 @@ class AgesLineChartWidget extends StatelessWidget {
               ),
             ),
           ],
-          minY: -1,
-          maxY: agesList.length * 0.65,
+          minY: 0,
           titlesData: FlTitlesData(
             bottomTitles: SideTitles(
                 showTitles: true,
@@ -186,56 +185,19 @@ class AgesLineChartWidget extends StatelessWidget {
             leftTitle: AxisTitle(
               showTitle: true,
               titleText: 'No. patients',
-              margin: 4,
+              margin: 0,
             ),
             bottomTitle: AxisTitle(
               showTitle: true,
               margin: 0,
               titleText: 'Age',
               textStyle: dateTextStyle,
-              textAlign: TextAlign.right,
             ),
           ),
           gridData: FlGridData(
             show: true,
             checkToShowHorizontalLine: (double value) {
-              return value ==
-                      agesList
-                          .where(
-                            (el) =>
-                                double.parse(el.age!) <= 30 &&
-                                double.parse(el.age!) > 20,
-                          )
-                          .length
-                          .toDouble() ||
-                  value ==
-                      agesList
-                          .where((el) =>
-                              double.parse(el.age!) <= 50 &&
-                              double.parse(el.age!) > 40)
-                          .length
-                          .toDouble() ||
-                  value ==
-                      agesList
-                          .where((el) =>
-                              double.parse(el.age!) <= 70 &&
-                              double.parse(el.age!) > 60)
-                          .length
-                          .toDouble() ||
-                  value ==
-                      agesList
-                          .where((el) =>
-                              double.parse(el.age!) <= 40 &&
-                              double.parse(el.age!) > 30)
-                          .length
-                          .toDouble() ||
-                  value ==
-                      agesList
-                          .where((el) =>
-                              double.parse(el.age!) <= 100 &&
-                              double.parse(el.age!) > 90)
-                          .length
-                          .toDouble();
+              return true;
             },
           ),
         ),

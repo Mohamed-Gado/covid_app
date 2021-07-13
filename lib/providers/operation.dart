@@ -154,6 +154,9 @@ class Operation with ChangeNotifier {
   }
 
   Future<void> fetchDatabaseSymptoms() async {
+    if (_sqlSymptoms.length > 0) {
+      return;
+    }
     final dataList = await DBHelper.getData('symptoms');
     final List<Symptoms> _symptoms = [];
     dataList
@@ -173,7 +176,6 @@ class Operation with ChangeNotifier {
     print('SQLITE: ${_symptoms.length}');
     _sqlSymptoms = _symptoms;
     notifyListeners();
-    filterSqlSymptomsByDay('one');
   }
 
   Future<void> fetchDatabaseItems() async {
