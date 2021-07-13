@@ -69,13 +69,13 @@ class _PatientsInfoScreenState extends State<PatientsInfoScreen> {
                     Divider(),
                     ListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: Text('Number of Vaccined patients:'),
+                      title: Text('Number of vaccinated patients:'),
                       trailing: Text('${vacPatients.length}'),
                     ),
                     Divider(),
                     ListTile(
                       contentPadding: EdgeInsets.zero,
-                      title: Text('Number of fully Vaccined:'),
+                      title: Text('Number of fully vaccinated:'),
                       trailing: Text(
                           '${vacPatients.where((el) => el.vaccineData!.dose == 'Two').length}'),
                     ),
