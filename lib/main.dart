@@ -3,6 +3,7 @@ import 'package:covid_app/providers/operation.dart';
 import 'package:covid_app/screens/add_medical_report_screen.dart';
 import 'package:covid_app/screens/add_test_result_screen.dart';
 import 'package:covid_app/screens/admin_analysis_screen.dart';
+import 'package:covid_app/screens/analyze_patient_data_screen.dart';
 import 'package:covid_app/screens/auth_screen.dart';
 import 'package:covid_app/screens/check_user_location_screen.dart';
 import 'package:covid_app/screens/diseases_screen.dart';
@@ -76,6 +77,8 @@ class MyApp extends StatelessWidget {
             PatientsInfoScreen.routeName: (ctx) => PatientsInfoScreen(),
             AdminAnalysisScreen.routeName: (ctx) => AdminAnalysisScreen(),
             AddTestResultScreen.routeName: (ctx) => AddTestResultScreen(),
+            AnalyzePatientDataScreen.routeName: (ctx) =>
+                AnalyzePatientDataScreen(),
           },
         ),
       ),

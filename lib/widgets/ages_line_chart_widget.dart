@@ -16,7 +16,7 @@ class AgesLineChartWidget extends StatelessWidget {
     );
 
     return SizedBox(
-      width: 300,
+      width: 350,
       height: 180,
       child: LineChart(
         LineChartData(

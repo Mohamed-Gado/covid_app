@@ -14,7 +14,7 @@ class AdminAnalysisScreen extends StatefulWidget {
 }
 
 class _AdminAnalysisScreenState extends State<AdminAnalysisScreen> {
-  bool isInit = true;
+  bool isInit = false;
   String selectedGender = 'All';
   List<String> genderList = [
     'All',
@@ -48,13 +48,13 @@ class _AdminAnalysisScreenState extends State<AdminAnalysisScreen> {
   @override
   void didChangeDependencies() {
     if (isInit) {
-      Provider.of<Operation>(context, listen: false)
-          .fetchDatabaseItems()
-          .then((value) {
-        setState(() {
-          isInit = false;
-        });
-      });
+      // Provider.of<Operation>(context, listen: false)
+      //     .fetchDatabaseItems()
+      //     .then((value) {
+      //   setState(() {
+      //     isInit = false;
+      //   });
+      // });
     }
     super.didChangeDependencies();
   }
@@ -87,166 +87,169 @@ class _AdminAnalysisScreenState extends State<AdminAnalysisScreen> {
                   ],
                 ),
               )
-            : dbItems.length <= 0
-                ? Center(
-                    child: Text('No Symptoms to show'),
-                  )
-                : TabBarView(
-                    children: [
-                      ListView(
-                        padding:
-                            EdgeInsets.only(left: 8.0, right: 8.0, top: 16.0),
-                        children: [
-                          Text(
-                            'Filters:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(height: 12.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Gender: '),
-                              Container(
-                                padding: EdgeInsets.all(4.0),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(border: Border.all()),
-                                height: 40,
-                                width: MediaQuery.of(context).size.width / 2,
-                                child: DropdownButtonFormField<String>(
-                                  decoration: InputDecoration.collapsed(
-                                    hintText: '',
-                                  ),
-                                  hint: Text('Select Gender'),
-                                  value: selectedGender,
-                                  items: genderList.map(
-                                    (gender) {
-                                      return DropdownMenuItem<String>(
-                                        value: gender,
-                                        child: Text(gender),
+            : TabBarView(
+                children: [
+                  dbItems.length <= 0
+                      ? Center(
+                          child: Text('No Symptoms to show'),
+                        )
+                      : ListView(
+                          padding:
+                              EdgeInsets.only(left: 8.0, right: 8.0, top: 16.0),
+                          children: [
+                            Text(
+                              'Filters:',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(height: 12.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Gender: '),
+                                Container(
+                                  padding: EdgeInsets.all(4.0),
+                                  alignment: Alignment.center,
+                                  decoration:
+                                      BoxDecoration(border: Border.all()),
+                                  height: 40,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  child: DropdownButtonFormField<String>(
+                                    decoration: InputDecoration.collapsed(
+                                      hintText: '',
+                                    ),
+                                    hint: Text('Select Gender'),
+                                    value: selectedGender,
+                                    items: genderList.map(
+                                      (gender) {
+                                        return DropdownMenuItem<String>(
+                                          value: gender,
+                                          child: Text(gender),
+                                        );
+                                      },
+                                    ).toList(),
+                                    onChanged: (gender) {
+                                      setState(() {
+                                        selectedGender = gender!;
+                                      });
+                                      Provider.of<Operation>(context,
+                                              listen: false)
+                                          .filterDbItems(
+                                        selectedCountry,
+                                        selectedAge,
+                                        gender!,
                                       );
                                     },
-                                  ).toList(),
-                                  onChanged: (gender) {
-                                    setState(() {
-                                      selectedGender = gender!;
-                                    });
-                                    Provider.of<Operation>(context,
-                                            listen: false)
-                                        .filterDbItems(
-                                      selectedCountry,
-                                      selectedAge,
-                                      gender!,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Age Range: '),
-                              Container(
-                                padding: EdgeInsets.all(4.0),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(border: Border.all()),
-                                height: 40,
-                                width: MediaQuery.of(context).size.width / 2,
-                                child: DropdownButtonFormField<String>(
-                                  decoration: InputDecoration.collapsed(
-                                    hintText: '',
                                   ),
-                                  hint: Text('Select Range'),
-                                  value: selectedAge,
-                                  items: ageRanges.map(
-                                    (range) {
-                                      return DropdownMenuItem<String>(
-                                        value: range,
-                                        child: Text(range),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Age Range: '),
+                                Container(
+                                  padding: EdgeInsets.all(4.0),
+                                  alignment: Alignment.center,
+                                  decoration:
+                                      BoxDecoration(border: Border.all()),
+                                  height: 40,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  child: DropdownButtonFormField<String>(
+                                    decoration: InputDecoration.collapsed(
+                                      hintText: '',
+                                    ),
+                                    hint: Text('Select Range'),
+                                    value: selectedAge,
+                                    items: ageRanges.map(
+                                      (range) {
+                                        return DropdownMenuItem<String>(
+                                          value: range,
+                                          child: Text(range),
+                                        );
+                                      },
+                                    ).toList(),
+                                    onChanged: (range) {
+                                      setState(() {
+                                        selectedAge = range!;
+                                      });
+                                      Provider.of<Operation>(context,
+                                              listen: false)
+                                          .filterDbItems(
+                                        selectedCountry,
+                                        range!,
+                                        selectedGender,
                                       );
                                     },
-                                  ).toList(),
-                                  onChanged: (range) {
-                                    setState(() {
-                                      selectedAge = range!;
-                                    });
-                                    Provider.of<Operation>(context,
-                                            listen: false)
-                                        .filterDbItems(
-                                      selectedCountry,
-                                      range!,
-                                      selectedGender,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Country: '),
-                              Container(
-                                padding: EdgeInsets.all(4.0),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(border: Border.all()),
-                                height: 40,
-                                width: MediaQuery.of(context).size.width / 2,
-                                child: DropdownButtonFormField<String>(
-                                  decoration: InputDecoration.collapsed(
-                                    hintText: '',
                                   ),
-                                  hint: Text('Select Country'),
-                                  value: selectedCountry,
-                                  items: countries.map(
-                                    (country) {
-                                      return DropdownMenuItem<String>(
-                                        value: country,
-                                        child: Text(country),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Country: '),
+                                Container(
+                                  padding: EdgeInsets.all(4.0),
+                                  alignment: Alignment.center,
+                                  decoration:
+                                      BoxDecoration(border: Border.all()),
+                                  height: 40,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  child: DropdownButtonFormField<String>(
+                                    decoration: InputDecoration.collapsed(
+                                      hintText: '',
+                                    ),
+                                    hint: Text('Select Country'),
+                                    value: selectedCountry,
+                                    items: countries.map(
+                                      (country) {
+                                        return DropdownMenuItem<String>(
+                                          value: country,
+                                          child: Text(country),
+                                        );
+                                      },
+                                    ).toList(),
+                                    onChanged: (country) {
+                                      setState(() {
+                                        selectedCountry = country!;
+                                      });
+                                      Provider.of<Operation>(context,
+                                              listen: false)
+                                          .filterDbItems(
+                                        country!,
+                                        selectedAge,
+                                        selectedGender,
                                       );
                                     },
-                                  ).toList(),
-                                  onChanged: (country) {
-                                    setState(() {
-                                      selectedCountry = country!;
-                                    });
-                                    Provider.of<Operation>(context,
-                                            listen: false)
-                                        .filterDbItems(
-                                      country!,
-                                      selectedAge,
-                                      selectedGender,
-                                    );
-                                  },
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          ListTile(
-                            contentPadding: EdgeInsets.all(0),
-                            title: Text('Number of Samples:'),
-                            trailing: Text(
-                                '${filteredDbItems.length} of ${dbItems.length}'),
-                          ),
-                          Text(
-                            'Symptoms:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(height: 12.0),
-                          SymptomsBarChartWidget(),
-                          Text(
-                            'Severity:',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                          const SizedBox(height: 12.0),
-                          SeverityBarChartWidget(),
-                        ],
-                      ),
-                      AnalyzeByDayWidget(),
-                    ],
-                  ),
+                              ],
+                            ),
+                            ListTile(
+                              contentPadding: EdgeInsets.all(0),
+                              title: Text('Number of Samples:'),
+                              trailing: Text(
+                                  '${filteredDbItems.length} of ${dbItems.length}'),
+                            ),
+                            Text(
+                              'Symptoms:',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(height: 12.0),
+                            SymptomsBarChartWidget(),
+                            Text(
+                              'Severity:',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(height: 12.0),
+                            SeverityBarChartWidget(),
+                          ],
+                        ),
+                  AnalyzeByDayWidget(),
+                ],
+              ),
       ),
     );
   }
@@ -282,7 +285,7 @@ class _AnalyzeByDayWidgetState extends State<AnalyzeByDayWidget> {
   void didChangeDependencies() {
     if (isInit) {
       Provider.of<Operation>(context, listen: false)
-          .fetchDatabaseSymptoms()
+          .getSQLSymptoms()
           .then((value) {
         setState(() {
           Provider.of<Operation>(context, listen: false)
@@ -349,18 +352,18 @@ class _AnalyzeByDayWidgetState extends State<AnalyzeByDayWidget> {
                 style: TextStyle(fontSize: 20),
               ),
               SizedBox(height: 8.0),
-              SymptomsDayChartWidget(),
+              _SymptomsDayChartWidget(),
             ],
           );
   }
 }
 
-class SymptomsDayChartWidget extends StatefulWidget {
+class _SymptomsDayChartWidget extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => BarChartWidgetState();
 }
 
-class BarChartWidgetState extends State<SymptomsDayChartWidget> {
+class BarChartWidgetState extends State<_SymptomsDayChartWidget> {
   List<String> _defaultSymptoms = [
     'Fever',
     'Dry Cough',

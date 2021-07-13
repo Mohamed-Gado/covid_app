@@ -1,4 +1,5 @@
 import 'package:covid_app/screens/admin_analysis_screen.dart';
+import 'package:covid_app/screens/analyze_patient_data_screen.dart';
 import 'package:covid_app/screens/patients_info_screen.dart';
 import 'package:covid_app/widgets/grid_item_widget.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,8 @@ class AdminHomeWidget extends StatelessWidget {
             secondaryColor: Colors.green[900]!,
             text: "Analyze patient data",
             onPressed: () {
-              Navigator.of(context).pushNamed(PatientsInfoScreen.routeName);
+              Navigator.of(context)
+                  .pushNamed(AnalyzePatientDataScreen.routeName);
             },
           ),
           GridItemWidget(

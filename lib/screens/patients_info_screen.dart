@@ -16,15 +16,18 @@ class _PatientsInfoScreenState extends State<PatientsInfoScreen> {
   bool isInit = true;
   @override
   void didChangeDependencies() {
-    if (isInit) {
-      Provider.of<Operation>(context, listen: false)
-          .getPatients()
-          .then((value) {
-        setState(() {
-          isInit = false;
-        });
-      });
-    }
+    // if (isInit) {
+    //   Provider.of<Operation>(context, listen: false)
+    //       .getPatients()
+    //       .then((value) {
+    //     setState(() {
+    //       isInit = false;
+    //       Provider.of<Operation>(context, listen: false)
+    //           .insertPatientsToSQL()
+    //           .then((value) => print('DONE'));
+    //     });
+    //   });
+    // }
     super.didChangeDependencies();
   }
 

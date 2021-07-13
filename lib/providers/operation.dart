@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:covid_app/helpers/db_helper.dart';
+// import 'package:covid_app/helpers/db_helper.dart';
 import 'package:covid_app/models/db_item.dart';
 import 'package:covid_app/models/disease.dart';
 import 'package:covid_app/models/medical_report.dart';
@@ -153,63 +153,180 @@ class Operation with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchDatabaseSymptoms() async {
-    if (_sqlSymptoms.length > 0) {
-      return;
+  // Future<void> insertPatientsToSQL() async {
+  //   try {
+  //     data.forEach((key, value) async {
+  //       final response = await http.post(
+  //         Uri.parse(
+  //             "https://covid-flutter.000webhostapp.com/insert_patient.php"),
+  //         body: {
+  //           "id": key,
+  //           'bloodType': value['blood_type'] ?? '',
+  //           'currentLocation': value['current_location'] == null
+  //               ? ''
+  //               : value['current_location']['location']
+  //                   .toString()
+  //                   .split(',')
+  //                   .last,
+  //           'currentLati': value['current_location'] == null
+  //               ? ''
+  //               : value['current_location']['lati'] ?? '',
+  //           'currentLongi': value['current_location'] == null
+  //               ? ''
+  //               : value['current_location']['longi'] ?? '',
+  //           'age': value['age'] ?? '',
+  //           'email': value['email'] ?? '',
+  //           'fullname': value['fullname'] ?? '',
+  //           'gender': value['gender'] ?? '',
+  //           'joinTime': value['joinTime'] ?? '',
+  //           'location': value['location'] == null
+  //               ? ''
+  //               : value['location']['location'].toString().split(',').last,
+  //           'lati': value['location'] == null
+  //               ? ''
+  //               : value['location']['lati'] ?? '',
+  //           'longi': value['location'] == null
+  //               ? ''
+  //               : value['location']['longi'] ?? '',
+  //           'occupation': value['occupation'] ?? '',
+  //           'phone': value['phone'] ?? '',
+  //           'userType': value['userType'] ?? '',
+  //           'vaccinated': value['vaccinated'] == true ? '1' : '0',
+  //           'dateOfVaccination': value['vaccinated'] == true
+  //               ? value['vaccine_data']['dateOfVaccination'] ?? ''
+  //               : '',
+  //           'dose': value['vaccinated'] == true
+  //               ? value['vaccine_data']['dose'] ?? ''
+  //               : '',
+  //           'vaccineType': value['vaccinated'] == true
+  //               ? value['vaccine_data']['vaccineType'] ?? ''
+  //               : '',
+  //         },
+  //         headers: {
+  //           "Accept": "application/json",
+  //         },
+  //       );
+  //       print('SQL: ${response.body}');
+  //     });
+  //   } catch (err) {
+  //     throw err;
+  //   }
+  // }
+
+  Future<void> getSQLPatients() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          "https://covid-flutter.000webhostapp.com/get_patients.php",
+        ),
+      );
+      final dataList =
+          List<Map<String, dynamic>>.from(json.decode(response.body));
+      print('SQL: ${response.body}');
+      // final List<Symptoms> _symptoms = [];
+      // dataList
+      //     .map(
+      //       (item) => item.forEach((key, value) {
+      //         print(
+      //             '${value.toString().replaceAll('[', '').replaceAll(']', '')}');
+      //         if (key == 'id' || value.isEmpty) {
+      //           return;
+      //         }
+      //         _symptoms.add(
+      //           Symptoms(
+      //             day: key,
+      //             symptomsOfDay: value
+      //                 .toString()
+      //                 .replaceAll('[', '')
+      //                 .replaceAll(']', '')
+      //                 .split(','),
+      //             userId: dataList.indexOf(item).toString(),
+      //           ),
+      //         );
+      //       }),
+      //     )
+      //     .toList();
+      // print('SQLITE: ${_symptoms.length}');
+      // _sqlSymptoms = _symptoms;
+      // notifyListeners();
+    } catch (err) {
+      throw err;
     }
-    final dataList = await DBHelper.getData('symptoms');
-    final List<Symptoms> _symptoms = [];
-    dataList
-        .map(
-          (item) => item.forEach((key, value) {
-            _symptoms.add(
-              Symptoms(
-                day: key,
-                symptomsOfDay: List<String>.from(
-                    json.decode(value.toString().replaceAll("'", '"'))),
-                userId: dataList.indexOf(item).toString(),
-              ),
-            );
-          }),
-        )
-        .toList();
-    print('SQLITE: ${_symptoms.length}');
-    _sqlSymptoms = _symptoms;
-    notifyListeners();
   }
 
-  Future<void> fetchDatabaseItems() async {
-    final dataList = await DBHelper.getData('cov_db');
-    _databaseItems = dataList
-        .map(
-          (item) => DBItem(
-            age0To9: item['Age_0-9'] == 1,
-            age10to19: item['Age_10-19'] == 1,
-            age20to24: item['Age_20-24'] == 1,
-            age25to59: item['Age_25-59'] == 1,
-            age60: item['Age_60+'] == 1,
-            male: item['Gender_Male'] == 1,
-            female: item['Gender_Female'] == 1,
-            other: item['Gender_Transgender'] == 1,
-            country: item['Country'],
-            difficultyInBreathing: item['Difficulty-in-Breathing'] == 1,
-            dryCough: item['Dry-Cough'] == 1,
-            runnyNose: item['Runny-Nose'] == 1,
-            fever: item['Fever'] == 1,
-            noneSympton: item['None_Sympton'] == 1,
-            pains: item['Pains'] == 1,
-            severityMild: item['Severity_Mild'] == 1,
-            severityModerate: item['Severity_Moderate'] == 1,
-            severityNone: item['Severity_None'] == 1,
-            severitySevere: item['Severity_Severe'] == 1,
-            soreThroat: item['Sore-Throat'] == 1,
-            tiredness: item['Tiredness'] == 1,
-          ),
-        )
-        .toList();
-    print('Database: ${_databaseItems.length}');
-    filterDbItems('All', 'All', 'All');
+  Future<void> getSQLSymptoms() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          "https://covid-flutter.000webhostapp.com/get_symptoms.php",
+        ),
+      );
+      final dataList =
+          List<Map<String, dynamic>>.from(json.decode(response.body));
+      print('SQL: ${response.body}');
+      final List<Symptoms> _symptoms = [];
+      dataList
+          .map(
+            (item) => item.forEach((key, value) {
+              print(
+                  '${value.toString().replaceAll('[', '').replaceAll(']', '')}');
+              if (key == 'id' || value.isEmpty) {
+                return;
+              }
+              _symptoms.add(
+                Symptoms(
+                  day: key,
+                  symptomsOfDay: value
+                      .toString()
+                      .replaceAll('[', '')
+                      .replaceAll(']', '')
+                      .split(','),
+                  userId: dataList.indexOf(item).toString(),
+                ),
+              );
+            }),
+          )
+          .toList();
+      print('SQLITE: ${_symptoms.length}');
+      _sqlSymptoms = _symptoms;
+      notifyListeners();
+    } catch (err) {
+      throw err;
+    }
   }
+
+  // Future<void> fetchDatabaseItems() async {
+  //   final dataList = await DBHelper.getData('cov_db');
+  //   _databaseItems = dataList
+  //       .map(
+  //         (item) => DBItem(
+  //           age0To9: item['Age_0-9'] == 1,
+  //           age10to19: item['Age_10-19'] == 1,
+  //           age20to24: item['Age_20-24'] == 1,
+  //           age25to59: item['Age_25-59'] == 1,
+  //           age60: item['Age_60+'] == 1,
+  //           male: item['Gender_Male'] == 1,
+  //           female: item['Gender_Female'] == 1,
+  //           other: item['Gender_Transgender'] == 1,
+  //           country: item['Country'],
+  //           difficultyInBreathing: item['Difficulty-in-Breathing'] == 1,
+  //           dryCough: item['Dry-Cough'] == 1,
+  //           runnyNose: item['Runny-Nose'] == 1,
+  //           fever: item['Fever'] == 1,
+  //           noneSympton: item['None_Sympton'] == 1,
+  //           pains: item['Pains'] == 1,
+  //           severityMild: item['Severity_Mild'] == 1,
+  //           severityModerate: item['Severity_Moderate'] == 1,
+  //           severityNone: item['Severity_None'] == 1,
+  //           severitySevere: item['Severity_Severe'] == 1,
+  //           soreThroat: item['Sore-Throat'] == 1,
+  //           tiredness: item['Tiredness'] == 1,
+  //         ),
+  //       )
+  //       .toList();
+  //   print('Database: ${_databaseItems.length}');
+  //   filterDbItems('All', 'All', 'All');
+  // }
 
   Future<void> getPatients() async {
     _patients = [];
@@ -566,10 +683,37 @@ class Operation with ChangeNotifier {
       }
       _symptoms[day] = symptoms;
       notifyListeners();
+      saveSymptomsToSql(patientId, _symptoms);
       return true;
     } catch (err) {
       throw err;
     }
+  }
+
+  Future<void> saveSymptomsToSql(String key, dynamic value) async {
+    final response = await http.post(
+      Uri.parse("https://covid-flutter.000webhostapp.com/insert_symptoms.php"),
+      body: {
+        "id": key,
+        "one": value['one'] ?? '',
+        "two": value['two'] ?? '',
+        "three": value['three'] ?? '',
+        "four": value['four'] ?? '',
+        "five": value['five'] ?? '',
+        "six": value['six'] ?? '',
+        "seven": value['seven'] ?? '',
+        "eight": value['eight'] ?? '',
+        "nine": value['nine'] ?? '',
+        "ten": value['ten'] ?? '',
+        "eleven": value['eleven'] ?? '',
+        "twelve": value['twelve'] ?? '',
+        "thirteen": value['thirteen'] ?? '',
+        "fourteen": value['fourteen'] ?? '',
+      },
+      headers: {
+        "Accept": "application/json",
+      },
+    );
   }
 
   Future<bool> addNewDisease(

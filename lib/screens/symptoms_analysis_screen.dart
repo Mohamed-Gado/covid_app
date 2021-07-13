@@ -49,7 +49,7 @@ class _SymptomsAnalysisScreenState extends State<SymptomsAnalysisScreen> {
   void didChangeDependencies() {
     if (isInit) {
       Provider.of<Operation>(context, listen: false)
-          .fetchDatabaseItems()
+          .getSQLSymptoms()
           .then((value) {
         setState(() {
           isInit = false;
