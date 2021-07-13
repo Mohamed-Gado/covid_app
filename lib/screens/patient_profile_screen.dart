@@ -518,7 +518,9 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                 children: [
                   Text('Vaccine Data:'),
                   Text(
-                    user.vaccinated == true ? 'Vaccined' : 'Not Vaccined yet',
+                    user.vaccinated == true
+                        ? 'Vaccinated'
+                        : 'Not vaccinated yet',
                   ),
                 ],
               ),
