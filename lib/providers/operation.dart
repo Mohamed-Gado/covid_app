@@ -4,6 +4,8 @@ import 'package:covid_app/helpers/db_helper.dart';
 import 'package:covid_app/models/db_item.dart';
 import 'package:covid_app/models/disease.dart';
 import 'package:covid_app/models/medical_report.dart';
+import 'package:covid_app/models/quarantine_item.dart';
+import 'package:covid_app/models/symptom.dart';
 import 'package:covid_app/models/test_result.dart';
 import 'package:covid_app/models/user.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +63,47 @@ class Operation with ChangeNotifier {
     return [..._medicalReports];
   }
 
+  // quarantine Data
+  List<QuarantineItem> _quarantineData = [];
+  List<QuarantineItem> get quarantineData {
+    return [..._quarantineData];
+  }
+
+  // SQLITE Symptoms data
+  List<Symptoms> _sqlSymptoms = [];
+  List<Symptoms> _sqlSymptomsOfDay = [];
+  List<Symptoms> get sqlSymptomsOfDay {
+    return [..._sqlSymptomsOfDay];
+  }
+
+  List<Symptoms> get sqlSymptoms {
+    return [..._sqlSymptoms];
+  }
+
+  void filterSqlSymptomsByDay(String day) {
+    _sqlSymptomsOfDay = [..._sqlSymptoms];
+    _sqlSymptomsOfDay =
+        _sqlSymptomsOfDay.where((item) => item.day == day).toList();
+    notifyListeners();
+  }
+
+  // Symptoms Data
+  List<Symptoms> _symptomsList = [];
+  List<Symptoms> _symptomsOfDay = [];
+  List<Symptoms> get symptomsOfDay {
+    return [..._symptomsOfDay];
+  }
+
+  List<Symptoms> get symptomsList {
+    return [..._symptomsList];
+  }
+
+  void filterSymptomsByDay(String day) {
+    _symptomsOfDay = [..._symptomsList];
+    _symptomsOfDay = _symptomsOfDay.where((item) => item.day == day).toList();
+    notifyListeners();
+  }
+
   // database items
   List<DBItem> _databaseItems = [];
   List<DBItem> _filteredDbItems = [];
@@ -110,8 +153,31 @@ class Operation with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchDatabaseSymptoms() async {
+    final dataList = await DBHelper.getData('symptoms');
+    final List<Symptoms> _symptoms = [];
+    dataList
+        .map(
+          (item) => item.forEach((key, value) {
+            _symptoms.add(
+              Symptoms(
+                day: key,
+                symptomsOfDay: List<String>.from(
+                    json.decode(value.toString().replaceAll("'", '"'))),
+                userId: dataList.indexOf(item).toString(),
+              ),
+            );
+          }),
+        )
+        .toList();
+    print('SQLITE: ${_symptoms.length}');
+    _sqlSymptoms = _symptoms;
+    notifyListeners();
+    filterSqlSymptomsByDay('one');
+  }
+
   Future<void> fetchDatabaseItems() async {
-    final dataList = await DBHelper.getData();
+    final dataList = await DBHelper.getData('cov_db');
     _databaseItems = dataList
         .map(
           (item) => DBItem(
@@ -209,6 +275,39 @@ class Operation with ChangeNotifier {
     }
   }
 
+  Future<void> getAllSymptoms() async {
+    var uri = Uri.https(base_url, 'symptoms.json', {'auth': _authToken});
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode >= 400) {
+        return;
+      }
+      if (response.body == 'null' || response.body.isEmpty) {
+        return;
+      }
+      final List<Symptoms> symptoms = [];
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+      responseData.forEach((id, value) {
+        final data = Map<String, dynamic>.from(value);
+        data.forEach((day, value) {
+          final symList = List<dynamic>.from(value);
+          symptoms.add(
+            Symptoms(
+              day: day,
+              symptomsOfDay: symList.map((e) => e.toString()).toList(),
+              userId: id,
+            ),
+          );
+        });
+      });
+      _symptomsList = symptoms;
+      notifyListeners();
+      filterSymptomsByDay('one');
+    } catch (err) {
+      throw err;
+    }
+  }
+
   Future<void> getPatientSymptoms(String patientId) async {
     _symptoms = {
       'one': [],
@@ -250,10 +349,41 @@ class Operation with ChangeNotifier {
     }
   }
 
+  Future<bool> addTestResult(TestResult newResult, String patientId) async {
+    var uri = Uri.https(
+      base_url,
+      'test_results/$patientId.json',
+      {'auth': _authToken},
+    );
+    try {
+      final response = await http.post(
+        uri,
+        body: json.encode(
+          {
+            'date': newResult.date,
+            'patientName': newResult.patientName,
+            'patientEmail': newResult.patientEmail,
+            'positive': newResult.positive,
+          },
+        ),
+      );
+      print('test_results: ${response.body}');
+      if (response.statusCode >= 400) {
+        return false;
+      }
+      return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
   Future<void> getTestResult(String patientId) async {
     _testResults = [];
     var uri = Uri.https(
-        base_url, 'test_results/$patientId.json', {'auth': _authToken});
+      base_url,
+      'test_results/$patientId.json',
+      {'auth': _authToken},
+    );
     try {
       final response = await http.get(uri);
       print('test_results: ${response.body}');
@@ -263,17 +393,19 @@ class Operation with ChangeNotifier {
       if (response.body == 'null' || response.body.isEmpty) {
         return;
       }
-      final responseData = json.decode(response.body) as List<dynamic>;
-      final loadedResults = responseData
-          .map(
-            (test) => TestResult(
-              date: test['date'],
-              patientName: test['patientName'],
-              patientEmail: test['patientEmail'],
-              positive: test['positive'],
-            ),
-          )
-          .toList();
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+      final List<TestResult> loadedResults = [];
+      responseData.forEach((key, test) {
+        loadedResults.add(
+          TestResult(
+            date: test['date'],
+            patientName: test['patientName'],
+            patientEmail: test['patientEmail'],
+            positive: test['positive'],
+          ),
+        );
+      });
+
       _testResults = loadedResults;
       notifyListeners();
     } catch (err) {
@@ -307,6 +439,41 @@ class Operation with ChangeNotifier {
       notifyListeners();
     } catch (err) {
       throw err;
+    }
+  }
+
+  Future<void> getQuarantineData(String patientId) async {
+    _quarantineData = [];
+    var uri = Uri.https(
+      base_url,
+      'quarantine/$patientId.json',
+      {'auth': _authToken},
+    );
+    try {
+      final response = await http.get(uri);
+      if (response.statusCode >= 400) {
+        return;
+      }
+      if (response.body == 'null' || response.body.isEmpty) {
+        return;
+      }
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+      List<QuarantineItem> fetchedData = [];
+      responseData.forEach((key, data) {
+        fetchedData.add(
+          QuarantineItem(
+            date: data['date'],
+            isHome: data['isHome'],
+            latitude: data['latitude'],
+            location: data['location'],
+            longitude: data['longitude'],
+          ),
+        );
+        _quarantineData = fetchedData;
+        notifyListeners();
+      });
+    } catch (e) {
+      throw e;
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:covid_app/providers/operation.dart';
 import 'package:covid_app/widgets/ages_line_chart_widget.dart';
-import 'package:covid_app/widgets/symptoms_bar_chart_widget.dart';
 import 'package:covid_app/widgets/vaccine_bar_chart_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

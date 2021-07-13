@@ -3,15 +3,23 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SymptomsBarChartWidget extends StatefulWidget {
+class SymptomsDayChartWidget extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => BarChartWidgetState();
 }
 
-class BarChartWidgetState extends State<SymptomsBarChartWidget> {
+class BarChartWidgetState extends State<SymptomsDayChartWidget> {
+  List<String> _defaultSymptoms = [
+    'Fever',
+    'Dry Cough',
+    'Mucus or Phlegm',
+    'Shortness of breath',
+    'Loss of appetite',
+    'Body aches',
+  ];
   @override
   Widget build(BuildContext context) {
-    final dbItems = Provider.of<Operation>(context).filteredDbItems;
+    final symptomsOfDay = Provider.of<Operation>(context).symptomsOfDay;
     return AspectRatio(
       aspectRatio: 1.7,
       child: Card(
@@ -24,7 +32,7 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
             BarChartData(
               alignment: BarChartAlignment.spaceAround,
               groupsSpace: 8.0,
-              maxY: dbItems.length * 1.3,
+              maxY: symptomsOfDay.length * 1.3,
               barTouchData: BarTouchData(
                 enabled: false,
                 touchTooltipData: BarTouchTooltipData(
@@ -60,19 +68,19 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
                   getTitles: (double value) {
                     switch (value.toInt()) {
                       case 0:
-                        return 'Fever';
+                        return _defaultSymptoms[0];
                       case 1:
-                        return 'dry\ncough';
+                        return 'Dry\nCough';
                       case 2:
-                        return 'runny\nnose';
+                        return 'Mucus\nor Phlegm';
                       case 3:
-                        return 'Breathing\ndifficulty';
+                        return 'Shortness\nof breath';
                       case 4:
-                        return 'Pains';
+                        return 'Loss of\nappetite';
                       case 5:
-                        return 'sore\nthroat';
+                        return 'Body\naches';
                       case 6:
-                        return 'tiredness';
+                        return 'Other';
                       case 7:
                         return 'none';
                       default:
@@ -90,9 +98,11 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
                   x: 0,
                   barRods: [
                     BarChartRodData(
-                      y: (dbItems
+                      y: (symptomsOfDay
                               .where(
-                                (item) => item.fever,
+                                (item) => item.symptomsOfDay.contains(
+                                  _defaultSymptoms[0],
+                                ),
                               )
                               .length)
                           .toDouble(),
@@ -108,9 +118,11 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
                   x: 1,
                   barRods: [
                     BarChartRodData(
-                        y: (dbItems
+                        y: (symptomsOfDay
                                 .where(
-                                  (item) => item.dryCough,
+                                  (item) => item.symptomsOfDay.contains(
+                                    _defaultSymptoms[1],
+                                  ),
                                 )
                                 .length)
                             .toDouble(),
@@ -122,9 +134,11 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
                   x: 2,
                   barRods: [
                     BarChartRodData(
-                        y: (dbItems
+                        y: (symptomsOfDay
                                 .where(
-                                  (item) => item.runnyNose,
+                                  (item) => item.symptomsOfDay.contains(
+                                    _defaultSymptoms[2],
+                                  ),
                                 )
                                 .length)
                             .toDouble(),
@@ -136,9 +150,11 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
                   x: 3,
                   barRods: [
                     BarChartRodData(
-                        y: (dbItems
+                        y: (symptomsOfDay
                                 .where(
-                                  (item) => item.difficultyInBreathing,
+                                  (item) => item.symptomsOfDay.contains(
+                                    _defaultSymptoms[3],
+                                  ),
                                 )
                                 .length)
                             .toDouble(),
@@ -150,9 +166,11 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
                   x: 4,
                   barRods: [
                     BarChartRodData(
-                        y: (dbItems
+                        y: (symptomsOfDay
                                 .where(
-                                  (item) => item.pains,
+                                  (item) => item.symptomsOfDay.contains(
+                                    _defaultSymptoms[4],
+                                  ),
                                 )
                                 .length)
                             .toDouble(),
@@ -164,9 +182,11 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
                   x: 5,
                   barRods: [
                     BarChartRodData(
-                        y: (dbItems
+                        y: (symptomsOfDay
                                 .where(
-                                  (item) => item.soreThroat,
+                                  (item) => item.symptomsOfDay.contains(
+                                    _defaultSymptoms[5],
+                                  ),
                                 )
                                 .length)
                             .toDouble(),
@@ -178,11 +198,17 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
                   x: 6,
                   barRods: [
                     BarChartRodData(
-                        y: (dbItems
-                                .where(
-                                  (item) => item.tiredness,
-                                )
-                                .length)
+                        y: (symptomsOfDay.where(
+                          (item) {
+                            for (final sym in item.symptomsOfDay) {
+                              if (!_defaultSymptoms.contains(sym) &&
+                                  sym != 'No Symptoms') {
+                                return true;
+                              }
+                            }
+                            return false;
+                          },
+                        ).length)
                             .toDouble(),
                         colors: [Colors.lightBlueAccent, Colors.greenAccent])
                   ],
@@ -192,9 +218,10 @@ class BarChartWidgetState extends State<SymptomsBarChartWidget> {
                   x: 7,
                   barRods: [
                     BarChartRodData(
-                        y: (dbItems
+                        y: (symptomsOfDay
                                 .where(
-                                  (item) => item.noneSympton,
+                                  (item) => item.symptomsOfDay
+                                      .contains('No Symptoms'),
                                 )
                                 .length)
                             .toDouble(),

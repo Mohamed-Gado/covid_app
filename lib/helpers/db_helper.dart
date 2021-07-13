@@ -10,14 +10,14 @@ class DBHelper {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String dbPath = path.join(
       documentsDirectory.path,
-      "cov_db.sqlite",
+      "covid_db.sqlite",
     );
 
     if (FileSystemEntity.typeSync(dbPath) == FileSystemEntityType.notFound) {
       ByteData data = await rootBundle.load(
         path.join(
           'assets/databases',
-          'cov_db.sqlite',
+          'covid_db.sqlite',
         ),
       );
       List<int> bytes = data.buffer.asUint8List(
@@ -33,10 +33,8 @@ class DBHelper {
     );
   }
 
-  static Future<List<Map<String, dynamic>>> getData() async {
+  static Future<List<Map<String, dynamic>>> getData(String table) async {
     final db = await DBHelper.database();
-    return db.query(
-      'cov_db',
-    );
+    return db.query(table);
   }
 }

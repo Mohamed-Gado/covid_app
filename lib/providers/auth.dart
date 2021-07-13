@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:covid_app/models/quarantine_item.dart';
 import 'package:covid_app/models/user.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Auth with ChangeNotifier {
@@ -327,6 +330,32 @@ class Auth with ChangeNotifier {
     return true;
   }
 
+  Future<void> addQuarantineItem(QuarantineItem item) async {
+    if (_user.type != 'Patient') {
+      return;
+    }
+    var uri = Uri.https(
+      base_url,
+      'quarantine/${_user.id}.json',
+      {'auth': _token},
+    );
+    try {
+      final response = await http.post(
+        uri,
+        body: json.encode({
+          'date': item.date,
+          'isHome': item.isHome,
+          'latitude': item.latitude,
+          'location': item.location,
+          'longitude': item.longitude,
+        }),
+      );
+      print('${response.body}');
+    } catch (err) {
+      throw err;
+    }
+  }
+
   Future<void> setUserCurrentLocation({
     required String location,
     required String lati,
@@ -354,6 +383,22 @@ class Auth with ChangeNotifier {
         }),
       );
       print('save user location: ${response.body}');
+
+      addQuarantineItem(
+        QuarantineItem(
+          date: DateFormat.yMMMd().add_jm().format(DateTime.now()),
+          isHome: Geolocator.distanceBetween(
+                double.parse(_user.currentLati ?? '0.0'),
+                double.parse(_user.currentLongi ?? '0.0'),
+                double.parse(_user.lati ?? '0.0'),
+                double.parse(_user.longi ?? '0.0'),
+              ) <=
+              20,
+          latitude: lati,
+          location: location,
+          longitude: longi,
+        ),
+      );
     } catch (err) {
       print('error: $err');
       throw err;
