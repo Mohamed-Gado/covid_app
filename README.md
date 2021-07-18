@@ -5,7 +5,7 @@ import some data from https://www.kaggle.com/iamhungundji/covid19-symptoms-check
 
 The app has four types of users (Patient, Doctor, Healthcare personnel, and Admin).
 
-First three types of users can sign up using (email/password) and once the user sign up we save his data (email/name/joinDateTiem/UserType) to realtime database on firebase.
+First three types of users can sign up using (email/password) and once the user sign up we save his data (email/name/joinDateTime/UserType) to realtime database on firebase.
 
 ## Patient user 
 
